@@ -1,65 +1,64 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Animated, ImageBackground } from 'react-native';
+import { StyleSheet, View, FlatList, Animated, TouchableOpacity, ImageBackground, Text } from 'react-native';
 import GoalItem from './components/GoalItem';
 import GoalInput from './components/GoalInput';
 
 export default function App() {
-
   const [courseGoals, setCourseGoals] = useState([]);
   const [isAddModal, setIsAddModal] = useState(false);
 
-  // Create an animated value for the button scale
   const buttonScale = useRef(new Animated.Value(1)).current;
 
-  const addGoalHandler = goalTitle => {
+  const addGoalHandler = (goalTitle, goalColor) => {
     setCourseGoals(currentGoals => [
       ...currentGoals, 
-      { id: Math.random().toString(), value: goalTitle }
+      { id: Math.random().toString(), value: goalTitle, color: goalColor }  // Save the color with the task
     ]);
-    setIsAddModal(false);    
-  } 
+    setIsAddModal(false);
+  };
 
   const deleteGoalHandler = goalId => {
-    setCourseGoals(currentGoals => {
-      return currentGoals.filter((goal) => goal.id !== goalId);
-    });
-  }
+    setCourseGoals(currentGoals => currentGoals.filter(goal => goal.id !== goalId));
+  };
 
   const cancelGoalHandler = () => {
     setIsAddModal(false);
-  }
+  };
 
-  // Animation when button is pressed
   const handlePressIn = () => {
     Animated.spring(buttonScale, {
-      toValue: 0.8, // Scale down
-      useNativeDriver: true
+      toValue: 0.8,
+      useNativeDriver: true,
     }).start();
   };
 
   const handlePressOut = () => {
     Animated.spring(buttonScale, {
-      toValue: 1, // Scale back to original size
+      toValue: 1,
       friction: 3,
       tension: 40,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start();
   };
 
   return (
     <ImageBackground
-      source={{ uri: 'https://i.pinimg.com/564x/27/b4/35/27b43590d9cb26442ef616bf94486101.jpg' }} // Replace with your own image URL or local image
+      source={{ uri: 'https://i.pinimg.com/564x/27/b4/35/27b43590d9cb26442ef616bf94486101.jpg' }}
       style={styles.backgroundImage}
     >
       <View style={styles.container}>
-        <GoalInput visible={isAddModal} onAddGoal={addGoalHandler} onCancel={cancelGoalHandler} /> 
+        <GoalInput visible={isAddModal} onAddGoal={addGoalHandler} onCancel={cancelGoalHandler} />
         <View style={styles.goalsContainer}>
-          <FlatList 
-            keyExtractor={(item, index) => item.id}
+          <FlatList
+            keyExtractor={(item) => item.id}
             data={courseGoals}
             renderItem={itemData => (
-              <GoalItem id={itemData.item.id} onDelete={deleteGoalHandler} title={itemData.item.value} />
+              <GoalItem
+                id={itemData.item.id}
+                title={itemData.item.value}
+                color={itemData.item.color}  // Pass the color to the GoalItem
+                onDelete={deleteGoalHandler}
+              />
             )}
           />
         </View>
@@ -85,29 +84,29 @@ export default function App() {
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    resizeMode: 'cover', // Ensures the image covers the entire background
-    justifyContent: 'center', // Ensures content is centered
+    resizeMode: 'cover',
+    justifyContent: 'center',
   },
   container: {
     flex: 1,
     padding: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional: Adds a white overlay with transparency
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
   goalsContainer: {
-    flex: 1, // Take up all available space for goals
+    flex: 1,
   },
   buttonContainer: {
     position: 'absolute',
-    bottom: 30, // Distance from the bottom of the screen
+    bottom: 30,
     left: 0,
     right: 0,
-    alignItems: 'center', // Center the button horizontally
+    alignItems: 'center',
   },
   button: {
     backgroundColor: '#be123c',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5, // Rectangular corners
+    borderRadius: 5,
     width: 200,
     alignItems: 'center',
   },
