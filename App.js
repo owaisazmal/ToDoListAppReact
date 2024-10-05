@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, TextInput, Modal, TouchableOpacity, FlatList, Animated, Easing } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Animated, ImageBackground } from 'react-native';
 import GoalItem from './components/GoalItem';
 import GoalInput from './components/GoalInput';
 
@@ -14,7 +14,7 @@ export default function App() {
 
   const addGoalHandler = goalTitle => {
     setCourseGoals(currentGoals => [
-      ...courseGoals, 
+      ...currentGoals, 
       { id: Math.random().toString(), value: goalTitle }
     ]);
     setIsAddModal(false);    
@@ -48,40 +48,50 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <GoalInput visible={isAddModal} onAddGoal={addGoalHandler} onCancel={cancelGoalHandler} /> 
-      <View style={styles.goalsContainer}>
-        <FlatList 
-          keyExtractor={(item, index) => item.id}
-          data={courseGoals}
-          renderItem={itemData => (
-            <GoalItem id={itemData.item.id} onDelete={deleteGoalHandler} title={itemData.item.value} />
-          )}
-        />
+    <ImageBackground
+      source={{ uri: 'https://i.pinimg.com/564x/27/b4/35/27b43590d9cb26442ef616bf94486101.jpg' }} // Replace with your own image URL or local image
+      style={styles.backgroundImage}
+    >
+      <View style={styles.container}>
+        <GoalInput visible={isAddModal} onAddGoal={addGoalHandler} onCancel={cancelGoalHandler} /> 
+        <View style={styles.goalsContainer}>
+          <FlatList 
+            keyExtractor={(item, index) => item.id}
+            data={courseGoals}
+            renderItem={itemData => (
+              <GoalItem id={itemData.item.id} onDelete={deleteGoalHandler} title={itemData.item.value} />
+            )}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPressIn={handlePressIn}
+              onPressOut={handlePressOut}
+              onPress={() => setIsAddModal(true)}
+            >
+              <View style={styles.button}>
+                <Text style={styles.buttonText}>Add New Goal</Text>
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
       </View>
-      <View style={styles.buttonContainer}>
-        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-            onPress={() => setIsAddModal(true)}
-          >
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>Add New Goal</Text>
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover', // Ensures the image covers the entire background
+    justifyContent: 'center', // Ensures content is centered
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     padding: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional: Adds a white overlay with transparency
   },
   goalsContainer: {
     flex: 1, // Take up all available space for goals
@@ -97,7 +107,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#be123c',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 25,
+    borderRadius: 5, // Rectangular corners
+    width: 200,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
@@ -105,4 +117,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
