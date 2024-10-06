@@ -1,10 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { View, TextInput, Modal, StyleSheet, TouchableOpacity, Animated, Text, ImageBackground } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select'; // Picker for selecting color
+import { Ionicons } from '@expo/vector-icons'; // For the dropdown arrow
 
 const GoalInput = (props) => {
   const [enteredGoal, setEnteredGoal] = useState('');
   const [selectedColor, setSelectedColor] = useState('#B0B0B0'); // Default color
+  const [isPickerFocused, setIsPickerFocused] = useState(false); // Track if dropdown is focused
 
   const borderColorAnim = useRef(new Animated.Value(0)).current;
 
@@ -39,6 +41,17 @@ const GoalInput = (props) => {
     setEnteredGoal('');
   };
 
+  // Custom icon for the dropdown
+  const DropdownIcon = () => {
+    return (
+      <Ionicons
+        name={isPickerFocused ? "chevron-up" : "chevron-down"} // Change icon based on state
+        size={24}
+        color={isPickerFocused ? "#3498db" : "gray"} // Change color based on state
+      />
+    );
+  };
+
   return (
     <Modal visible={props.visible} animationType="slide">
       <ImageBackground
@@ -60,10 +73,12 @@ const GoalInput = (props) => {
             </Animated.View>
           </View>
 
-          {/* Color Picker */}
+          {/* Color Picker with custom dropdown icon */}
           <View style={styles.colorPickerContainer}>
             <RNPickerSelect
               onValueChange={(value) => setSelectedColor(value)}
+              onOpen={() => setIsPickerFocused(true)}
+              onClose={() => setIsPickerFocused(false)}
               items={[
                 { label: 'Red', value: '#f28b82' },
                 { label: 'Green', value: '#ccff90' },
@@ -72,6 +87,12 @@ const GoalInput = (props) => {
                 { label: 'Purple', value: '#d7aefb' }
               ]}
               placeholder={{ label: 'Select a color', value: null }}
+              style={{
+                ...pickerSelectStyles,
+                iconContainer: { top: 12, right: 12 },
+              }}
+              useNativeAndroidPickerStyle={false} // Disable native Android picker styling
+              Icon={DropdownIcon} // Custom dropdown arrow
             />
           </View>
 
@@ -89,6 +110,31 @@ const GoalInput = (props) => {
     </Modal>
   );
 };
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // Ensure space for the icon
+    backgroundColor: '#f0f0f0', // Background color for the dropdown in iOS
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'gray',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // Ensure space for the icon
+    backgroundColor: '#f0f0f0', // Background color for the dropdown in Android
+  },
+});
 
 const styles = StyleSheet.create({
   backgroundImage: {
